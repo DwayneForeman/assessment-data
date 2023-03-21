@@ -249,15 +249,44 @@ module.exports = {
   },
 
   createCity: (request, response) => {
+    const { name, rating, countryId } = request.body;
+
     sequelize
       .query(
-        `INSERT INTO countries (name, rating, country_id, )
-      
-      
-      
-      `
+        `INSERT INTO cities (name, rating, country_id)
+       VALUES ('${name}', ${rating}, ${countryId})`
       )
+      .then((dbResult) => {
+        response.status(200).send(dbResult[0]);
+      })
+      .catch((error) => console.log(error));
+  },
 
+  getCities: (request, response) => {
+    sequelize
+      .query(
+        `SELECT cities.city_id, cities.name AS city, cities.rating, 
+        countries.country_id, countries.name AS country
+        FROM cities
+        JOIN countries
+        ON cities.country_id = countries.country_id
+        ORDER BY cities.rating DESC`
+      )
+      .then((dbResult) => {
+        response.status(200).send(dbResult[0]);
+      })
+      .catch((error) => console.log(error));
+  },
+
+  deleteCity: (request, response) => {
+    const { id } = request.params;
+    sequelize
+      .query(
+        `DELETE
+        FROM cities
+        WHERE city_id = ${id};
+        `
+      )
       .then((dbResult) => {
         response.status(200).send(dbResult[0]);
       })
